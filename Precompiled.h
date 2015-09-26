@@ -32,5 +32,42 @@
 
 #include "PxPhysicsAPI.h"
 
+//=============================================================================
+// EXTERNAL DECLARATIONS
+//=============================================================================
+#include "Engine/Game/GameEngine.h"
+#include "Engine/Managers/SpawnManager.h"
+#include "Engine/Tasks/SpawnTask.h"
+#include "Core/Game/Game.h"
+#include "Core/GameManagers/IGameSpawner.h"
+#include "Engine/Components/InputComponent.h"
+#include "Engine/Components/PlayerComponent.h"
+#include "PxPhysicsAPI.h"
+#include "PlayerBehaviour.h"
+
+#include "Engine/Managers/RenderManager.h"
+#include "Engine/Tasks/RenderTask.h"
+#include "Engine/Tasks/PlayerTask.h"
+#include "Engine/Tasks/InputTask.h"
+#include "Engine/Tasks/AITask.h"
+#include "Engine/Tasks/PhysicsTask.h"
+#include "Engine/Tasks/GameRulesTask.h"
+#include "Engine/Tasks/TimeTask.h"
+
+#include "Engine/Managers/WindowManager.h"
+#include "Engine/Managers/CameraManager.h"
+#include "Engine/Managers/SimulationManager.h"
+#include "Engine/Managers/PlayerManager.h"
+#include "Engine/Managers/AIManager.h"
+#include "Engine/Managers/GameLoopManager.h"
+#include "Engine/Managers/TimeManager.h"
+#include "Engine/Rendering/Camera.h"
+
+#include <Core/Components/IFollowPoseInterface.h>
+
+#define _USE_MATH_DEFINES
+#include <math.h>
+
+
 #endif // _NOPCH
 

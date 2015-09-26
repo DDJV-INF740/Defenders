@@ -136,7 +136,7 @@ void DefenderGame::loadLevel()
 	camera->as<IFollowPoseInterface>()->setPoseAdjustment([](const physx::PxTransform &iPose) {
 		PxTransform wCameraPose;
 		// Look down, where x is horizontal, z is vertical and y is up/down
-		wCameraPose.q = PxQuat(-M_PI, PxVec3(0, 1, 0)) * PxQuat(-M_PI / 2, PxVec3(1, 0, 0)); // for now...
+		wCameraPose.q = PxQuat(float(-M_PI), PxVec3(0, 1, 0)) * PxQuat(float(-M_PI) / 2, PxVec3(1, 0, 0)); // for now...
 		PxVec3 wFront(0, 0, 1);
 		wFront = wCameraPose.q.rotate(wFront);
 		wCameraPose.p = PxVec3(0, -20, iPose.p.z + 8.0f);

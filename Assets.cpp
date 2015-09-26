@@ -1,4 +1,4 @@
-#pragma once
+#include "Precompiled.h"
 
 #include "Assets.h"
 
