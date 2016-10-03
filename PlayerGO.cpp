@@ -15,7 +15,7 @@
 #include "Assets/Models/ModelRendering.h"
 #include "Core/GameObjects/IGameObjectData.h"
 #include "Core/GameObjects/IGameObject.h"
-#include "Core/GameManagers/IGameRendering.h"
+#include "Core/GameManagers/IRenderManager.h"
 #include "Engine/GameObjects/GameObject.h"
 #include "Core/GameObjects/GameObjectFactory.h"
 #include "CollisionTypes.h"
@@ -51,14 +51,14 @@ public:
 	{
 		//---------------------------------------------------------------------
 		// create the physic object
-		PxPhysics &physics = Game<IGameSimulation>()->physics();
+		PxPhysics &physics = Game<ISimulationManager>()->physics();
 
 		//static friction, dynamic friction, restitution
 		_material = physics.createMaterial(0.5f, 0.5f, 0.1f);
 
 		//---------------------------------------------------------------------
 		// create the render object
-		_model = new DotXModel(Game<IGameRendering>()->d3dDevice(), Assets::MESH_SHIP, Assets::TEXTURE_ROOT);
+		_model = new DotXModel(Game<IRenderManager>()->d3dDevice(), Assets::MESH_SHIP, Assets::TEXTURE_ROOT);
 
 		return 0;
 	}
@@ -77,7 +77,7 @@ public:
 	PxShape *_actorShape;
 
 public:
-	PlayerGOImp(const IGameObjectDataRef &aDataRef)
+	PlayerGOImp(const GameObjectDataRef &aDataRef)
 		: GameObject(aDataRef)
 		, _actorShape(nullptr)
 	{}
@@ -92,11 +92,11 @@ public:
 
 	//-------------------------------------------------------------------------
 	//
-	static IGameObjectData* loadData()
+	static GameObjectDataRef loadData()
 	{
 		PlayerGOData *data = new PlayerGOData();
 		data->load();
-		return data;
+		return GameObjectDataRef(data);
 	}
 
 	//-------------------------------------------------------------------------
@@ -104,7 +104,7 @@ public:
 	virtual void onSpawn(const PxTransform &aPose) override
 	{
 		// create the physic object
-		PxRigidDynamic &pxActor = addComponent<DynamicSimulationComponent>()->pxActor();
+		PxRigidDynamic &pxActor = ensureComponent<DynamicSimulationComponent>()->pxActor();
 		pxActor.setGlobalPose(aPose);
 		PxShape *actorShape = pxActor.createShape(PxSphereGeometry(0.5f), *_data->_material);
 		pxActor.setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
@@ -119,7 +119,7 @@ public:
 		// create the render object
 
 		// create the vertices using the CUSTOMVERTEX struct
-		addComponent<RenderComponent>()->setRenderPrimitive(IRenderPrimitiveRef(new ModelRendering(*_data->_model)));
+		ensureComponent<RenderComponent>()->setRenderPrimitive(IRenderPrimitiveRef(new ModelRendering(*_data->_model)));
 
 	}
 

@@ -7,7 +7,7 @@
 #include "Engine/Managers/SpawnManager.h"
 #include "Engine/Tasks/SpawnTask.h"
 #include "Core/Game/Game.h"
-#include "Core/GameManagers/IGameSpawner.h"
+#include "Core/GameManagers/ISpawnManager.h"
 #include "Engine/Components/InputComponent.h"
 #include "Engine/Components/PlayerComponent.h"
 #include "PxPhysicsAPI.h"
@@ -66,24 +66,24 @@ public:
 	{
 		GameEngine::init();
 
-		addComponent<WindowManager>();
-		addComponent<RenderManager>();
-		addComponent<SimulationManager>();
-		addComponent<SpawnManager>();
-		addComponent<AIManager>();
-		addComponent<PlayerManager>();
-		addComponent<CameraManager>();
-		addComponent<GameLoopManager>();
-		addComponent<TimeManager>();
+		ensureComponent<WindowManager>();
+		ensureComponent<RenderManager>();
+		ensureComponent<SimulationManager>();
+		ensureComponent<SpawnManager>();
+		ensureComponent<AIManager>();
+		ensureComponent<PlayerManager>();
+		ensureComponent<CameraManager>();
+		ensureComponent<GameLoopManager>();
+		ensureComponent<TimeManager>();
 
-		addTask(new SpawnTask, SPAWNTASK);
-		addTask(new RenderTask, RENDERTASK);
-		addTask(new PlayerTask, PLAYERTASK);
-		addTask(new InputTask, INPUTTASK);
-		addTask(new AITask, AITASK);
-		addTask(new GameRulesTask, GAMERULESTASK);
-		addTask(new PhysicsTask, PHYSICSTASK);
-		addTask(new TimeTask, TIMERTASK);
+		addTask<SpawnTask>(SPAWNTASK);
+		addTask<RenderTask>(RENDERTASK);
+		addTask<PlayerTask>(PLAYERTASK);
+		addTask<InputTask>(INPUTTASK);
+		addTask<AITask>(AITASK);
+		addTask<GameRulesTask>(GAMERULESTASK);
+		addTask<PhysicsTask>(PHYSICSTASK);
+		addTask<TimeTask>(TIMERTASK);
 
 		loadLevel();
 		return true;
@@ -105,14 +105,14 @@ public:
 	void unloadLevel()
 	{
 		// unspawn every remaining objects
-		Game<IGameSpawner>()->unspawnAll();
-		Game<IGameSpawner>()->update();
+		Game<ISpawnManager>()->unspawnAll();
+		Game<ISpawnManager>()->update();
 	}
 };
 
 
 
-GameEngineRef IGameEngine::Instance()
+GameEngineRef& IGameEngine::Instance()
 {
 	static GameEngineRef sGame(new DefenderGame);
 	return sGame;
@@ -121,17 +121,17 @@ GameEngineRef IGameEngine::Instance()
 
 void DefenderGame::loadLevel()
 {
-	Game<IGameSimulation>()->scene().setGravity(PxVec3(0, 0, 0));
+	Game<ISimulationManager>()->scene().setGravity(PxVec3(0, 0, 0));
 	// spawn the player
-	GameObjectRef player = Game<IGameSpawner>()->spawn<PlayerGO>(PxTransform(PxVec3(0, 0, 0)));
-	player->addComponent<KeyboardInputComponent>();
-	player->addComponent<PlayerComponent>()->setBehaviour(IBehaviourRef(new PlayerBehaviour));
+	GameObjectRef player = Game<ISpawnManager>()->spawn<PlayerGO>(PxTransform(PxVec3(0, 0, 0)));
+	player->ensureComponent<KeyboardInputComponent>();
+	player->ensureComponent<PlayerComponent>()->setBehaviour(IBehaviourRef(new PlayerBehaviour));
 
 	// spawn an enemy
-	Game<IGameSpawner>()->spawn<AlienGO>(PxTransform(PxVec3(0, 0, 18)));
+	Game<ISpawnManager>()->spawn<AlienGO>(PxTransform(PxVec3(0, 0, 18)));
 
 
-	GameObjectRef camera = Game<IGameSpawner>()->spawn<ICamera>(PxTransform(PxVec3(0, 0, 0)));
+	GameObjectRef camera = Game<ISpawnManager>()->spawn<ICamera>(PxTransform(PxVec3(0, 0, 0)));
 
 	camera->as<IFollowPoseInterface>()->setPoseAdjustment([](const physx::PxTransform &iPose) {
 		PxTransform wCameraPose;

@@ -4,11 +4,11 @@
 #include "Core/GameObjects/IGameObject.h"
 #include "Core/GameObjects/IGameObjectData.h"
 #include "Assets/Models/MeshModel.h"
-#include "Core/GameManagers/IGameSimulation.h"
+#include "Core/GameManagers/ISimulationManager.h"
 #include "Core/Game/Game.h"
-#include "Core/GameManagers/IGameRendering.h"
+#include "Core/GameManagers/IRenderManager.h"
 #include "Core/GameObjects/IBehaviour.h"
-#include "Core/GameManagers/IGameSpawner.h"
+#include "Core/GameManagers/ISpawnManager.h"
 #include "Engine/GameObjects/GameObject.h"
 #include "Engine/Components/RenderComponent.h"
 #include "Assets/Models/ModelRendering.h"
@@ -26,7 +26,7 @@ using namespace physx;
 class AlienGOData : public IGameObjectData
 {
 public:
-	typedef std::auto_ptr<MeshModel> MeshModelRef;
+	typedef std::unique_ptr<MeshModel> MeshModelRef;
 	MeshModelRef _model;
 	PxMaterial *_material;
 	float _radius;
@@ -44,7 +44,7 @@ public:
 
 		// create the physic object
 
-		_material = Game<IGameSimulation>()->physics().createMaterial(0.5f, 0.5f, 0.1f);    //static friction, dynamic friction, restitution
+		_material = Game<ISimulationManager>()->physics().createMaterial(0.5f, 0.5f, 0.1f);    //static friction, dynamic friction, restitution
 
 																							//----------------------------------------------------------
 																							// create the render object
@@ -96,23 +96,23 @@ public:
 
 	//-------------------------------------------------------------------------
 	//
-	AlienGOImp(const IGameObjectDataRef &aDataRef)
+	AlienGOImp(const GameObjectDataRef &aDataRef)
 		: GameObject(aDataRef)
 	{}
 
 public:
 	virtual void onSpawn(const PxTransform &aPose) override
 	{
-		addComponent<RenderComponent>()->setRenderPrimitive(IRenderPrimitiveRef(new ModelRendering(*_data->_model)));
+		ensureComponent<RenderComponent>()->setRenderPrimitive(IRenderPrimitiveRef(new ModelRendering(*_data->_model)));
 
 		// setup simulation component
-		auto simulationComponent = addComponent<DynamicSimulationComponent>();
+		auto simulationComponent = ensureComponent<DynamicSimulationComponent>();
 		PxRigidDynamic &pxActor = simulationComponent->pxActor();
 		pxActor.setGlobalPose(aPose);
 
 		PxShape *actorShape = pxActor.createShape(PxSphereGeometry(_data->_radius), *_data->_material);
 
-		addComponent<AIComponent>()->setBehaviour(IBehaviourRef(new AlienBehaviour));
+		ensureComponent<AIComponent>()->setBehaviour(IBehaviourRef(new AlienBehaviour));
 	}
 
 	//-------------------------------------------------------------------------

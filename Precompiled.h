@@ -39,11 +39,9 @@
 #include "Engine/Managers/SpawnManager.h"
 #include "Engine/Tasks/SpawnTask.h"
 #include "Core/Game/Game.h"
-#include "Core/GameManagers/IGameSpawner.h"
+#include "Core/GameManagers/ISpawnManager.h"
 #include "Engine/Components/InputComponent.h"
 #include "Engine/Components/PlayerComponent.h"
-#include "PxPhysicsAPI.h"
-#include "PlayerBehaviour.h"
 
 #include "Engine/Managers/RenderManager.h"
 #include "Engine/Tasks/RenderTask.h"
@@ -68,6 +66,13 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+#include "PxPhysicsAPI.h"
+using namespace physx;
+using namespace std;
+using namespace engine;
+
+#include "PxPhysicsAPI.h"
+#include "PlayerBehaviour.h"
 
 #endif // _NOPCH
 

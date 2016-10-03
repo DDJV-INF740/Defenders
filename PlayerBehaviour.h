@@ -6,10 +6,10 @@ class PlayerActorState
 {
 public:
 	PlayerActorState()
-		: _lastFireTime(0)
+		: _lastFireTime(Game<ITimeManager>()->currentTime())
 	{}
 
-	double _lastFireTime;
+	TimeManager::time_point _lastFireTime;
 };
 
 

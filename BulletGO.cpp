@@ -4,12 +4,12 @@
 #include "Core/GameObjects/IGameObject.h"
 #include "Core/GameObjects/IGameObjectData.h"
 #include "Assets/Models/MeshModel.h"
-#include "Core/GameManagers/IGameSimulation.h"
+#include "Core/GameManagers/ISimulationManager.h"
 #include "Core/Game/Game.h"
-#include "Core/GameManagers/IGameRendering.h"
+#include "Core/GameManagers/IRenderManager.h"
 #include "Core/GameObjects/IBehaviour.h"
-#include "Core/GameManagers/IGameTime.h"
-#include "Core/GameManagers/IGameSpawner.h"
+#include "Core/GameManagers/ITimeManager.h"
+#include "Core/GameManagers/ISpawnManager.h"
 #include "Engine/GameObjects/GameObject.h"
 #include "Engine/Components/RenderComponent.h"
 #include "Assets/Models/ModelRendering.h"
@@ -19,6 +19,7 @@
 #include "Loader/Models/ModelFactory.h"
 #include "CollisionTypes.h"
 #include "PxPhysicsAPI.h"
+#include <chrono>
 
 #include <d3dx9.h>
 
@@ -27,7 +28,7 @@ using namespace physx;
 class BulletGOData : public IGameObjectData
 {
 public:
-	typedef std::auto_ptr<MeshModel> MeshModelRef;
+	typedef std::unique_ptr<MeshModel> MeshModelRef;
 	MeshModelRef _model;
 	PxMaterial *_material;
 	float _radius;
@@ -45,7 +46,7 @@ public:
 
 		// create the physic object
 
-		_material = Game<IGameSimulation>()->physics().createMaterial(0.5f, 0.5f, 0.1f);    //static friction, dynamic friction, restitution
+		_material = Game<ISimulationManager>()->physics().createMaterial(0.5f, 0.5f, 0.1f);    //static friction, dynamic friction, restitution
 
 																							//----------------------------------------------------------
 																							// create the render object
@@ -69,11 +70,11 @@ class BulletGOState
 {
 public:
 	BulletGOState()
-		: _spawnTime(0)
+		: _spawnTime(Game<ITimeManager>()->currentTime())
 	{}
 
 public:
-	double _spawnTime;
+	TimeManager::time_point _spawnTime;
 };
 
 class BulletBehaviour : virtual public IBehaviour
@@ -85,13 +86,13 @@ private:
 public:
 	BulletBehaviour()
 	{
-		_state._spawnTime = Game<IGameTime>()->currentTime();
+		_state._spawnTime = Game<ITimeManager>()->currentTime();
 	}
 
 	virtual void update(const GameObjectRef &iGameObject) override
 	{
-		if (Game<IGameTime>()->currentTime() - _state._spawnTime > 10)
-			Game<IGameSpawner>()->unspawn(iGameObject);
+		if (chrono::duration_cast<chrono::seconds>(Game<ITimeManager>()->currentTime() - _state._spawnTime).count() > 10)
+			Game<ISpawnManager>()->unspawn(iGameObject);
 	}
 };
 
@@ -106,17 +107,17 @@ public:
 
 	//-------------------------------------------------------------------------
 	//
-	BulletGOImp(const IGameObjectDataRef &aDataRef)
+	BulletGOImp(const GameObjectDataRef &aDataRef)
 		: GameObject(aDataRef)
 	{}
 
 public:
 	virtual void onSpawn(const PxTransform &aPose) override
 	{
-		addComponent<RenderComponent>()->setRenderPrimitive(IRenderPrimitiveRef(new ModelRendering(*_data->_model)));
+		ensureComponent<RenderComponent>()->setRenderPrimitive(IRenderPrimitiveRef(new ModelRendering(*_data->_model)));
 
 		// setup simulation component
-		auto simulationComponent = addComponent<DynamicSimulationComponent>();
+		auto simulationComponent = ensureComponent<DynamicSimulationComponent>();
 		PxRigidDynamic &pxActor = simulationComponent->pxActor();
 		pxActor.setGlobalPose(aPose);
 
@@ -127,7 +128,7 @@ public:
 		filterData.word1 = eACTOR_ENEMY | eACTOR_BULLET;
 		actorShape->setSimulationFilterData(filterData);
 
-		addComponent<AIComponent>()->setBehaviour(IBehaviourRef(new BulletBehaviour));
+		ensureComponent<AIComponent>()->setBehaviour(IBehaviourRef(new BulletBehaviour));
 	}
 
 	//-------------------------------------------------------------------------

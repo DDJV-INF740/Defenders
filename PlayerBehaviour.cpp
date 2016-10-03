@@ -7,7 +7,7 @@
 #include "Engine/Components/InputComponent.h"
 #include "Engine/Managers/SpawnManager.h"
 #include "Core/Game/Game.h"
-#include "Core/GameManagers/IGameTime.h"
+#include "Core/GameManagers/ITimeManager.h"
 #include "Engine/Components/SimulationComponent.h"
 #include "PxPhysicsAPI.h"
 
@@ -30,35 +30,35 @@ void PlayerBehaviour::update(const GameObjectRef &iGameObject)
 	}
 
 	static float kRotateStep = 0.02f; // angle in radians
-	if (keyboardInput->isPressed(KEY_RIGHT))
+	if (keyboardInput->isPressed(ControllerKey::KEY_RIGHT))
 	{
 		PxTransform transform = poseInterface->pose();
 		transform.p.x -= 0.1f;
 		poseInterface->setPose(transform);
 	}
-	else if (keyboardInput->isPressed(KEY_LEFT))
+	else if (keyboardInput->isPressed(ControllerKey::KEY_LEFT))
 	{
 		PxTransform transform = poseInterface->pose();
 		transform.p.x += 0.1f;
 		poseInterface->setPose(transform);
 	}
-	if (keyboardInput->isPressed(KEY_ABUTTON))
+	if (keyboardInput->isPressed(ControllerKey::KEY_ABUTTON))
 	{
 		const int kMaxFireRate = 10;
-		if (Game<IGameTime>()->currentTime() - _state._lastFireTime > 1.0f / kMaxFireRate)
+		if (chrono::duration_cast<chrono::milliseconds>(Game<ITimeManager>()->currentTime() - _state._lastFireTime).count() > 1000 / kMaxFireRate)
 		{
 			PxTransform pose = poseInterface->pose();
 			PxVec3 frontVec = pose.q.rotate(PxVec3(0, 0, 1));
 			PxVec3 spawnPos = pose.p + frontVec * 1;
-			GameObjectRef ball = Game<IGameSpawner>()->spawn<BulletGO>(PxTransform(spawnPos, pose.q));
+			GameObjectRef ball = Game<ISpawnManager>()->spawn<BulletGO>(PxTransform(spawnPos, pose.q));
 
 			PxVec3 ballSpeed = pose.q.rotate(PxVec3(0, 0, 15.0f));
 			ball->as<IDynamicSimulationInterface>()->pxActor().setLinearVelocity(PxVec3(ballSpeed.x, ballSpeed.y, ballSpeed.z));
-			_state._lastFireTime = Game<IGameTime>()->currentTime();
+			_state._lastFireTime = Game<ITimeManager>()->currentTime();
 		}
 	}
 
-	if (keyboardInput->isPressed(KEY_UP))
+	if (keyboardInput->isPressed(ControllerKey::KEY_UP))
 	{
 		PxTransform transform = poseInterface->pose();
 		PxVec3 frontVector = transform.q.rotate(PxVec3(0, 0, 1));
@@ -66,7 +66,7 @@ void PlayerBehaviour::update(const GameObjectRef &iGameObject)
 		transform.p += frontVector / 10;
 		poseInterface->setPose(transform);
 	}
-	else if (keyboardInput->isPressed(KEY_DOWN))
+	else if (keyboardInput->isPressed(ControllerKey::KEY_DOWN))
 	{
 		PxTransform transform = poseInterface->pose();
 		PxVec3 frontVector = transform.q.rotate(PxVec3(0, 0, 1));
@@ -82,14 +82,14 @@ void PlayerBehaviour::update(const GameObjectRef &iGameObject)
 		// 			_pxActor->setLinearVelocity(v);
 	}
 
-	if (keyboardInput->isPressed(KEY_SHIFTBUTTON))
+	if (keyboardInput->isPressed(ControllerKey::KEY_SHIFTBUTTON))
 	{
 		PxTransform transform = poseInterface->pose();
 		transform.p.y += 0.1f;
 		poseInterface->setPose(transform);
 	}
 
-	if (keyboardInput->isPressed(KEY_CTRLBUTTON))
+	if (keyboardInput->isPressed(ControllerKey::KEY_CTRLBUTTON))
 	{
 		PxTransform transform = poseInterface->pose();
 		transform.p.y -= 0.1f;
