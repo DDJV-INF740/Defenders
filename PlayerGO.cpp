@@ -85,18 +85,16 @@ public:
 public:
 	//-------------------------------------------------------------------------
 	//
-	static IGameObject::IdType TypeId()
-	{
-		return "PlayerGO";
-	}
-
-	//-------------------------------------------------------------------------
-	//
 	static GameObjectDataRef loadData()
 	{
 		PlayerGOData *data = new PlayerGOData();
 		data->load();
 		return GameObjectDataRef(data);
+	}
+
+	static GameObjectRef createInstance(const GameObjectDataRef &aDataRef)
+	{
+		return GameObject<PlayerGOImp, PlayerGOData>::createInstance(aDataRef);
 	}
 
 	//-------------------------------------------------------------------------
@@ -130,11 +128,13 @@ public:
 	}
 };
 
-//-----------------------------------------------------------------------------
-//
-IGameObject::IdType PlayerGO::TypeId()
+GameObjectDataRef PlayerGO::loadData()
 {
-	return PlayerGOImp::TypeId();
+	return PlayerGOImp::loadData();
 }
 
-RegisterGameObjectType<PlayerGOImp> gRegisterActor;
+GameObjectRef PlayerGO::createInstance(const GameObjectDataRef &aDataRef)
+{
+	return PlayerGOImp::createInstance(aDataRef);
+}
+

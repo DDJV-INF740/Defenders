@@ -100,16 +100,21 @@ class BulletGOImp : public BulletGO, public GameObject<BulletGOImp, BulletGOData
 {
 
 public:
-	static IGameObject::IdType TypeId()
-	{
-		return "BulletGO";
-	}
-
 	//-------------------------------------------------------------------------
 	//
 	BulletGOImp(const GameObjectDataRef &aDataRef)
 		: GameObject(aDataRef)
 	{}
+
+	static GameObjectDataRef loadData()
+	{
+		return GameObject<BulletGOImp, BulletGOData>::loadData();
+	}
+
+	static GameObjectRef createInstance(const GameObjectDataRef &aDataRef)
+	{
+		return GameObject<BulletGOImp, BulletGOData>::createInstance(aDataRef);
+	}
 
 public:
 	virtual void onSpawn(const PxTransform &aPose) override
@@ -137,12 +142,15 @@ public:
 	{}
 };
 
-//-----------------------------------------------------------------------------
-//
-IGameObject::IdType BulletGO::TypeId()
+
+
+GameObjectDataRef BulletGO::loadData()
 {
-	return BulletGOImp::TypeId();
+	return BulletGOImp::loadData();
 }
 
-RegisterGameObjectType<BulletGOImp> gRegisterActor;
+GameObjectRef BulletGO::createInstance(const GameObjectDataRef &aDataRef)
+{
+	return BulletGOImp::createInstance(aDataRef);
+}
 

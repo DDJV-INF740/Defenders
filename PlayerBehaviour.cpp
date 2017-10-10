@@ -12,22 +12,12 @@
 #include "PxPhysicsAPI.h"
 
 using namespace physx;
+using namespace std::chrono;
 
 void PlayerBehaviour::update(const GameObjectRef &iGameObject)
 {
 	std::shared_ptr<IKeyboardInputInterface> keyboardInput = iGameObject->as<IKeyboardInputInterface>();
 	std::shared_ptr<IPoseInterface> poseInterface = iGameObject->as<IPoseInterface>();
-
-	{
-		// 			// make sure the actor always has an up vector
-		// 			// point at (0, 1, 0)
-		// 			PxTransform pose = _pxActor->getGlobalPose();
-		// 			PxReal angle;
-		// 			PxVec3 axis;
-		// 			pose.q.toRadiansAndUnitAxis(angle, axis);
-		// 			pose.q = PxQuat(angle, PxVec3(0, axis.y > 0 ? 1 : -1, 0));
-		// 			_pxActor->setGlobalPose(pose);
-	}
 
 	static float kRotateStep = 0.02f; // angle in radians
 	if (keyboardInput->isPressed(ControllerKey::KEY_RIGHT))
@@ -45,7 +35,7 @@ void PlayerBehaviour::update(const GameObjectRef &iGameObject)
 	if (keyboardInput->isPressed(ControllerKey::KEY_ABUTTON))
 	{
 		const int kMaxFireRate = 10;
-		if (chrono::duration_cast<chrono::milliseconds>(Game<ITimeManager>()->currentTime() - _state._lastFireTime).count() > 1000 / kMaxFireRate)
+		if (duration_cast<milliseconds>(Game<ITimeManager>()->currentTime() - _state._lastFireTime).count() > 1000 / kMaxFireRate)
 		{
 			PxTransform pose = poseInterface->pose();
 			PxVec3 frontVec = pose.q.rotate(PxVec3(0, 0, 1));

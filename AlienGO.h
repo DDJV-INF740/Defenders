@@ -5,7 +5,9 @@
 class AlienGO : virtual public IGameObject
 {
 public:
-	static IGameObject::IdType TypeId();
+	static constexpr IdType TypeId = "AlienGO";
+	static GameObjectDataRef loadData();
+	static GameObjectRef createInstance(const GameObjectDataRef &aDataRef);
 };
 
 

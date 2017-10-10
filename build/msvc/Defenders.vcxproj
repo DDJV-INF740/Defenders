@@ -48,6 +48,7 @@
     </ProjectReference>
     <ProjectReference Include="..\..\..\GameEngine\Core\build\msvc\GameCore.vcxproj">
       <Project>{8535d046-350d-405e-ad6b-8dbd22a3f5ed}</Project>
+      <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
     </ProjectReference>
     <ProjectReference Include="..\..\..\GameEngine\Engine\build\msvc\GameEngine.vcxproj">
       <Project>{23feba19-85eb-4584-99e5-fa02ab27a614}</Project>
@@ -103,6 +104,7 @@
     <Import Project="config\Defenders.props" />
     <Import Project="..\..\..\config\msvc\using d3d.props" />
     <Import Project="..\..\..\config\msvc\using physx.props" />
+    <Import Project="..\..\..\config\msvc\using gsl.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -110,6 +112,7 @@
     <Import Project="config\Defenders.props" />
     <Import Project="..\..\..\config\msvc\using d3d.props" />
     <Import Project="..\..\..\config\msvc\using physx.props" />
+    <Import Project="..\..\..\config\msvc\using gsl.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -117,6 +120,7 @@
     <Import Project="config\Defenders.props" />
     <Import Project="..\..\..\config\msvc\using d3d.props" />
     <Import Project="..\..\..\config\msvc\using physx.props" />
+    <Import Project="..\..\..\config\msvc\using gsl.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -124,6 +128,7 @@
     <Import Project="config\Defenders.props" />
     <Import Project="..\..\..\config\msvc\using d3d.props" />
     <Import Project="..\..\..\config\msvc\using physx.props" />
+    <Import Project="..\..\..\config\msvc\using gsl.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

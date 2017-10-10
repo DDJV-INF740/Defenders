@@ -5,7 +5,9 @@
 class BulletGO : virtual public IGameObject
 {
 public:
-	static IGameObject::IdType TypeId();
+	static constexpr IdType TypeId = "BulletGO";
+	static GameObjectDataRef loadData();
+	static GameObjectRef createInstance(const GameObjectDataRef &aDataRef);
 };
 
 

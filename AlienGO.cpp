@@ -89,16 +89,21 @@ class AlienGOImp : public AlienGO, public GameObject<AlienGOImp, AlienGOData>
 {
 
 public:
-	static IGameObject::IdType TypeId()
-	{
-		return "AlienGO";
-	}
-
 	//-------------------------------------------------------------------------
 	//
 	AlienGOImp(const GameObjectDataRef &aDataRef)
 		: GameObject(aDataRef)
 	{}
+
+	static GameObjectDataRef loadData()
+	{
+		return GameObject<AlienGOImp, AlienGOData>::loadData();
+	}
+
+	static GameObjectRef createInstance(const GameObjectDataRef &aDataRef)
+	{
+		return GameObject<AlienGOImp, AlienGOData>::createInstance(aDataRef);
+	}
 
 public:
 	virtual void onSpawn(const PxTransform &aPose) override
@@ -121,12 +126,14 @@ public:
 	{}
 };
 
-//-----------------------------------------------------------------------------
-//
-IGameObject::IdType AlienGO::TypeId()
+
+GameObjectDataRef AlienGO::loadData()
 {
-	return AlienGOImp::TypeId();
+	return AlienGOImp::loadData();
 }
 
-RegisterGameObjectType<AlienGOImp> gRegisterActor;
+GameObjectRef AlienGO::createInstance(const GameObjectDataRef &aDataRef)
+{
+	return AlienGOImp::createInstance(aDataRef);
+}
 

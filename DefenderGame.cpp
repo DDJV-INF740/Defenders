@@ -8,6 +8,7 @@
 #include "Engine/Tasks/SpawnTask.h"
 #include "Core/Game/Game.h"
 #include "Core/GameManagers/ISpawnManager.h"
+#include "Core/GameObjects//GameObjectFactory.h"
 #include "Engine/Components/InputComponent.h"
 #include "Engine/Components/PlayerComponent.h"
 #include "PxPhysicsAPI.h"
@@ -21,6 +22,13 @@
 #include "Engine/Tasks/PhysicsTask.h"
 #include "Engine/Tasks/GameRulesTask.h"
 #include "Engine/Tasks/TimeTask.h"
+
+#include "Engine/Components/ComponentFactory.h"
+#include "Engine/Components/SimulationComponent.h"
+#include "Engine/Components/AIComponent.h"
+#include "Engine/Components/FollowPoseComponent.h"
+#include "Engine/Components/RenderComponent.h"
+#include "Engine/Components/RenderViewComponent.h"
 
 #include "Engine/Managers/WindowManager.h"
 #include "Engine/Managers/CameraManager.h"
@@ -36,6 +44,7 @@
 #include <math.h>
 #include "PlayerGO.h"
 #include "AlienGO.h"
+#include "BulletGO.h"
 
 using namespace physx;
 //=============================================================================
@@ -66,15 +75,46 @@ public:
 	{
 		GameEngine::init();
 
-		ensureComponent<WindowManager>();
-		ensureComponent<RenderManager>();
-		ensureComponent<SimulationManager>();
-		ensureComponent<SpawnManager>();
-		ensureComponent<AIManager>();
-		ensureComponent<PlayerManager>();
-		ensureComponent<CameraManager>();
-		ensureComponent<GameLoopManager>();
-		ensureComponent<TimeManager>();
+		{
+			GameManagerFactory& factory = GameManagerFactory::Instance();
+			factory.registerType<WindowManager>();
+			factory.registerType<RenderManager>();
+			factory.registerType<SimulationManager>();
+			factory.registerType<SpawnManager>();
+			factory.registerType<AIManager>();
+			factory.registerType<PlayerManager>();
+			factory.registerType<CameraManager>();
+			factory.registerType<GameLoopManager>();
+			factory.registerType<TimeManager>();
+		}
+
+		{
+			ComponentFactory& factory = ComponentFactory::Instance();
+			factory.registerType<DynamicSimulationComponent>();
+			factory.registerType<StaticSimulationComponent>();
+			factory.registerType<AIComponent>();
+			factory.registerType<FollowPoseComponent>();
+			factory.registerType<KeyboardInputComponent>();
+			factory.registerType<PlayerComponent>();
+			factory.registerType<RenderComponent>();
+			factory.registerType<RenderViewComponent>();
+		}
+
+		{
+			GameObjectFactory::registerGameObjectType(Camera::TypeId, &Camera::createInstance, &Camera::loadData);
+			GameObjectFactory::registerGameObjectType(PlayerGO::TypeId, &PlayerGO::createInstance, &PlayerGO::loadData);
+			GameObjectFactory::registerGameObjectType(AlienGO::TypeId, &AlienGO::createInstance, &AlienGO::loadData);
+			GameObjectFactory::registerGameObjectType(BulletGO::TypeId, &BulletGO::createInstance, &BulletGO::loadData);
+		}
+		ensureManager<WindowManager>();
+		ensureManager<RenderManager>();
+		ensureManager<SimulationManager>();
+		ensureManager<SpawnManager>();
+		ensureManager<AIManager>();
+		ensureManager<PlayerManager>();
+		ensureManager<CameraManager>();
+		ensureManager<GameLoopManager>();
+		ensureManager<TimeManager>();
 
 		addTask<SpawnTask>(SPAWNTASK);
 		addTask<RenderTask>(RENDERTASK);
@@ -131,7 +171,7 @@ void DefenderGame::loadLevel()
 	Game<ISpawnManager>()->spawn<AlienGO>(PxTransform(PxVec3(0, 0, 18)));
 
 
-	GameObjectRef camera = Game<ISpawnManager>()->spawn<ICamera>(PxTransform(PxVec3(0, 0, 0)));
+	GameObjectRef camera = Game<ISpawnManager>()->spawn<Camera>(PxTransform(PxVec3(0, 0, 0)));
 
 	camera->as<IFollowPoseInterface>()->setPoseAdjustment([](const physx::PxTransform &iPose) {
 		PxTransform wCameraPose;
